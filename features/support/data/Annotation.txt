@@ -1,0 +1,36 @@
+Sobre espera de elementos
+
+Por padrão o Capybara usa a metodologia de espera implícita de busca de elementos.
+
+O que isso quer dizer?
+Ao executar o método find("elemento"), o Capybara esperar por até 2 segundos para o mesmo seja exibido na página. Se isso não acontecer, é apresentando um erro do tipo Capybara ElementNotFound
+
+O código abaixo, preenche o formulário de login com senha incorreta e imprime no terminal a mensagem de alerta apresentada na página
+
+Sem sleep
+find("input[name=email]").set "eu@papito.io"
+find("input[name=password]").set "senha_invalida"
+click_button "Entrar"
+puts find(".alert").text
+Se o sistema demorar mais do que 2 segundos para exibir o elemento ".alert", o Capybara vai finalizar a execução com falha do tipo ElementNotFound. Porque 2 segundos é o timeout padrão do Capybara
+
+Com sleep
+
+find("input[name=email]").set "eu@papito.io"
+find("input[name=password]").set "senha_invalida"
+click_button "Entrar"
+sleep 3
+puts find(".alert").text
+Aparentemente resolve o problema, mas e se por algum motivo em uma nova versão, a exibição deste elemento ficar um pouco mais lenta? Aumentamos o Sleep para 5 segundos? Não, pois o ideal é alterar o timeout padrão do Capybara.
+
+Configurando o timeout implícito?
+Abra o arquivo env.rb do projeto e faça e acrescente a propriedade default_max_wait_time na configuração :
+
+Capybara.configure do |config|
+  config.default_driver = :selenium
+  config.app_host = "http://192.168.99.100:8080" # Docker ToolBox no Windows
+  #config.app_host = "http://localhost:8080" # Docker no Mac ou Linux
+  config.default_max_wait_time = 5
+end
+
+Enjoy
